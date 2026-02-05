@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TikTok OAuth Code</title>
+
+  <style>
+    :root {
+      --bg: #0b0f1a;
+      --bg-soft: #111628;
+      --card: #141a2f;
+      --text: #e7eaf6;
+      --muted: #9aa4c7;
+      --primary: #7c9cff;
+      --primary-700: #5e81ff;
+      --success: #48c78e;
+      --danger: #ff6b6b;
+      --border: #1f2742;
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+      --radius: 16px;
+    }
+
+    /* Reset & base */
+    * { box-sizing: border-box; }
+    html, body {
+      height: 100%;
+      background: radial-gradient(1000px 600px at 20% -20%, #17203f 0%, #0b0f1a 60%) no-repeat,
+                  var(--bg);
+      color: var(--text);
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    a { color: var(--primary); text-decoration: none; }
+    a:hover { color: var(--primary-700); }
+
+    /* Layout */
+    .site {
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      min-height: 100vh;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    /* Header */
+    .header {
+      backdrop-filter: saturate(135%) blur(6px);
+      background: linear-gradient(180deg, rgba(20,26,47,0.85) 0%, rgba(20,26,47,0.55) 100%);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+    }
+    .brand-logo {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #7c9cff, #48c78e);
+      box-shadow: 0 6px 18px rgba(124, 156, 255, 0.35);
+    }
+    .brand-title {
+      font-weight: 700;
+      letter-spacing: 0.2px;
+    }
+    .nav {
+      display: flex;
+      gap: 18px;
+      align-items: center;
+    }
+    .nav a {
+      color: var(--muted);
+      font-weight: 500;
+      padding: 10px 14px;
+      border-radius: 10px;
+    }
+    .nav a.active, .nav a:hover {
+      color: var(--text);
+      background: rgba(124, 156, 255, 0.12);
+      border: 1px solid rgba(124, 156, 255, 0.25);
+    }
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Main card */
+    .card {
+      background: linear-gradient(180deg, rgba(20,26,47,0.8) 0%, rgba(20,26,47,0.95) 100%);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 28px;
+      margin-top: 28px;
+    }
+    .card h1 {
+      margin: 0 0 12px;
+      font-size: 24px;
+      line-height: 1.3;
+    }
+    .card p.lead {
+      margin: 0 0 18px;
+      color: var(--muted);
+    }
+
+    /* Code box */
+    .code-box {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 16px;
+      align-items: start;
+      margin-top: 18px;
+    }
+    pre#code {
+      margin: 0;
+      padding: 18px;
+      background: #0f1426;
+      border: 1px solid #1d2440;
+      border-radius: 12px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 15px;
+      color: #c9d4ff;
+      overflow: auto;
+      min-height: 48px;
+    }
+    .actions {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    /* Buttons and badges */
+    .btn {
+      appearance: none;
+      border: 1px solid rgba(124, 156, 255, 0.35);
+      background: linear-gradient(180deg, rgba(124, 156, 255, 0.25) 0%, rgba(124, 156, 255, 0.18) 100%);
+      color: var(--text);
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform .05s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease;
+      box-shadow: 0 8px 22px rgba(124, 156, 255, 0.25);
+    }
+    .btn:hover {
+      transform: translateY(-1px);
+      border-color: rgba(124, 156, 255, 0.6);
+      box-shadow: 0 10px 26px rgba(124, 156, 255, 0.35);
+      background: linear-gradient(180deg, rgba(124, 156, 255, 0.35) 0%, rgba(124, 156, 255, 0.25) 100%);
+    }
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      border: 1px solid #234;
+      background: rgba(72, 199, 142, 0.12);
+      color: var(--success);
+    }
+    .badge .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--success);
+      box-shadow: 0 0 0 4px rgba(72,199,142,0.15);
+    }
+    .badge.hidden { display: none; }
+
+    /* Footer */
+    .footer {
+      border-top: 1px solid var(--border);
+      background: rgba(20,26,47,0.6);
+      margin-top: 36px;
+    }
+    .footer .footer-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 20px 24px;
+    }
+    .footer .links {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    .footer .links a {
+      color: var(--muted);
+      font-weight: 500;
+    }
+    .footer .links a:hover { color: var(--text); }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      .header-inner { flex-direction: column; align-items: flex-start; gap: 12px; }
+      .code-box { grid-template-columns: 1fr; }
+      .actions { flex-direction: row; }
+    }
+  </style>
+</head>
+<body>
+  <div class="site">
+    <!-- Header -->
+    <header class="header">
+      <div class="container header-inner">
+        <a href="/" class="brand" aria-label="На главную">
+          <span class="brand-logo" aria-hidden="true"></span>
+          <span class="brand-title">ACM</span>
+        </a>
+        <nav class="nav" aria-label="Основная навигация">
+          <a href="home.html">Home</a>
+          <a href="privacy.html">Privacy</a>
+          <a href="terms.html">Terms</a>
+          <a href="index.html" class="active">TikTok OAuth</a>
+        </nav>
+      </div>
+    </header>
+
+      <!-- Main -->
+      <main class="container">
+        <section class="card" aria-labelledby="title">
+          <h1 id="title">TikTok authorization code received</h1>
+          <p class="lead">Copy the code and paste it into the application to complete authorization.</p>
+
+          <div class="code-box">
+            <pre id="code" aria-live="polite">Loading...</pre>
+            <div class="actions">
+              <button id="copy-btn" class="btn" type="button">Copy the code</button>
+              <span id="success-msg" class="badge hidden" role="status" aria-live="polite">
+                <span class="dot" aria-hidden="true"></span>
+                The code is copied!
+              </span>
+            </div>
+          </div>
+
+          <div style="margin-top: 18px; color: var(--muted); font-size: 14px;">
+            If the code did not appear automatically, make sure that you returned to the correct redirect URL specified in the TikTok OAuth settings.
+          </div>
+        </section>
+      </main>
+
+      <!-- Footer -->
+      <footer class="footer">
+        <div class="container footer-inner">
+          <div>&copy; 2025 ACM. All rights reserved.</div>
+          <div class="links">
+            <a href="privacy.html">Privacy</a>
+            <a href="terms.html">Terms</a>
+          </div>
+        </div>
+      </footer>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get('code');
+
+    const codeElement = document.getElementById('code');
+    const copyBtn = document.getElementById('copy-btn');
+    const successMsg = document.getElementById('success-msg');
+
+    if (code) {
+      codeElement.textContent = code;
+    } else {
+      codeElement.textContent = 'Error: the code parameter was not found in the URL';
+      copyBtn.disabled = true;
+    }
+
+    copyBtn.addEventListener('click', async () => {
+      if (!code) return;
+      try {
+        await navigator.clipboard.writeText(code);
+        successMsg.classList.remove('hidden');
+        setTimeout(() => successMsg.classList.add('hidden'), 3000);
+      } catch (err) {
+        alert('Couldn\'t copy the code to the clipboard.');
+      }
+    });
+  </script>
+</body>
+</html>
